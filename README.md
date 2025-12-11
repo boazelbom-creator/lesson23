@@ -77,7 +77,19 @@ The generated HTML report (`output/report.html`) includes:
 - PCA 2D scatter plot showing correct/incorrect classifications
 - Detailed accuracy metrics
 
-**📊 [View Full HTML Report](./output/report.html)** - Download and open in your browser to see:
+**📊 View the Full HTML Report:**
+
+**Option 1: GitHub Pages (Live Preview)**
+🔗 **[View Report Online](https://boazelbom-creator.github.io/lesson23/)** - No download needed!
+
+**Option 2: Download and View Locally**
+1. Download [report.html](./output/report.html)
+2. Open it in your web browser
+
+**Option 3: Use HTMLPreview.github.io**
+🔗 [View via HTMLPreview](https://htmlpreview.github.io/?https://github.com/boazelbom-creator/lesson23/blob/main/output/report.html)
+
+The report includes:
 - Interactive confusion matrix heatmap
 - PCA scatter plot with all 38 test samples
 - Complete hyperplane weight vectors for all 4 features
