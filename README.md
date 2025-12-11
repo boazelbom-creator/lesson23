@@ -36,6 +36,27 @@ You can modify the default configuration in `main.py`:
 - Dataset split: 75% train (112 samples) / 25% test (38 samples)
 - Stratified random split with seed 42
 
+### Confusion Matrix
+```
+                 Predicted
+                 setosa  versicolor  virginica
+Actual setosa       13           0          0
+Actual versicolor    0          15          1
+Actual virginica     0           0          9
+```
+
+### Stage 1 SVM Parameters (Setosa vs Others)
+| Parameter | Standardized | Original Scale |
+|-----------|--------------|----------------|
+| Bias (b₁) | -0.802497 | -0.977254 |
+| Margin | 1.782642 | - |
+
+### Stage 2 SVM Parameters (Versicolor vs Virginica)
+| Parameter | Standardized | Original Scale |
+|-----------|--------------|----------------|
+| Bias (b₂) | -2.698949 | -7.892728 |
+| Margin | 0.662820 | - |
+
 ### Model Architecture
 **Stage 1 SVM** - Binary classification (Singleton vs Merged)
 - Separates `setosa` from (`versicolor` ∪ `virginica`)
@@ -46,15 +67,21 @@ You can modify the default configuration in `main.py`:
 - Linear kernel with C=1.0
 - Only processes samples classified as non-setosa by Stage 1
 
-### Report Contents
+### Full HTML Report
 The generated HTML report (`output/report.html`) includes:
 - Training configuration and hyperparameters
 - Stage 1 & Stage 2 hyperplane parameters (weights, bias, margins)
 - Parameters in both standardized and original feature spaces
 - Complete predictions table for all test samples
-- Confusion matrix visualization
+- Confusion matrix heatmap visualization
 - PCA 2D scatter plot showing correct/incorrect classifications
 - Detailed accuracy metrics
+
+**📊 [View Full HTML Report](./output/report.html)** - Download and open in your browser to see:
+- Interactive confusion matrix heatmap
+- PCA scatter plot with all 38 test samples
+- Complete hyperplane weight vectors for all 4 features
+- Full predictions table with stage-by-stage classification results
 
 ### Features
 - StandardScaler normalization fitted on training data
