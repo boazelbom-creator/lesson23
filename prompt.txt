@@ -1,0 +1,199 @@
+Prompt: “Iris Two‑Stage SVM (Cascade) — 75/25 Split — HTML Report”
+Objective
+Create a Python program (Python 3.10+) that uses a virtual environment and scikit-learn to train a two-stage SVM on the Iris dataset, with a 75% train / 25% test split (stratified and reproducible). The program should:
+
+Stage 1 (Binary SVM): Train an SVM on a merged class of two species versus the third species (default: “Setosa” vs “Non‑Setosa” where Non‑Setosa = Versicolor ∪ Virginica).
+Stage 2 (Binary SVM): Train a second SVM only on the merged group subset (default: Versicolor vs Virginica) to split them.
+Use the cascade for test-time predictions:
+
+If Stage 1 predicts the singleton class (e.g., Setosa), that is the final prediction.
+Otherwise, route the sample to Stage 2 to get the final species (Versicolor or Virginica).
+
+
+Produce a single self-contained HTML report with the required outputs (details below).
+
+Environment & Dependencies
+
+Use a virtual environment (e.g., create .venv, activate it).
+Install required packages: numpy, pandas, scikit-learn, matplotlib, seaborn.
+The script should be runnable end-to-end in a fresh environment.
+
+file size
+python files shell not exceed 150 lines each
+
+Data & Split
+
+Load the Iris dataset via sklearn.datasets.load_iris().
+Build a pandas.DataFrame with the 4 features and a species label column (string names preferred: setosa, versicolor, virginica).
+Perform a stratified split: 75% train / 25% test, random_state=42.
+Preserve original row indices for traceability in the final report.
+
+
+Preprocessing
+
+Standardize features using StandardScaler:
+
+Fit on train only, apply to train and test.
+
+
+Maintain consistent feature order and names (“sepal length (cm)”, “sepal width (cm)”, “petal length (cm)”, “petal width (cm)”).
+
+
+Modeling — Two-Stage Cascade
+Stage 1 (Binary SVM: merged pair vs singleton)
+
+Build a binary target:
+
+Default mapping: setosa → “Singleton” class; versicolor and virginica → “Merged” class.
+
+
+Train SVM with a linear kernel (kernel='linear') and a fixed C (default C=1.0) on standardized features.
+Capture model parameters: coef_ (weight vector w) and intercept_ (bias b) for the single binary classifier.
+Compute the margin in standardized space: margin=2∥w∥\text{margin} = \frac{2}{\|w\|}margin=∥w∥2​.
+
+Stage 2 (Binary SVM: split the merged pair)
+
+Filter the training set to only the merged class (e.g., Non‑Setosa).
+Train another linear SVM on those samples to separate the two species (versicolor vs virginica).
+Capture coef_ (w), intercept_ (b), and the margin 2∥w∥\frac{2}{\|w\|}∥w∥2​.
+
+Back-transform (optional but recommended)
+
+Provide w both in standardized space and original feature units.
+
+If xscaled=(x−μ)/sx_{\text{scaled}} = (x - \mu)/sxscaled​=(x−μ)/s and the learned hyperplane is w′⋅xscaled+b′=0w' \cdot x_{\text{scaled}} + b' = 0w′⋅xscaled​+b′=0, then in original units:
+
+w=w′/sw = w'/sw=w′/s (elementwise divide by scaler’s scale_)
+b=b′−w′⋅(μ/s)b = b' - w' \cdot (\mu/s)b=b′−w′⋅(μ/s)
+
+
+
+Prediction Logic (Test Set)
+
+For each test sample:
+
+Stage 1: Predict singleton vs merged.
+If singleton → final species = singleton (e.g., setosa).
+Else → Stage 2 predicts species within the merged pair (e.g., versicolor vs virginica).
+
+
+Construct a predictions table with columns:
+
+index (original row id),
+ground_truth (species),
+stage1_pred (Singleton vs Merged),
+stage2_pred (versicolor vs virginica; blank if singleton),
+final_pred (the resolved species).
+
+
+Compute test accuracy against final_pred vs ground_truth.
+Compute the confusion matrix on the final three-class predictions.
+
+
+Visualizations
+
+Confusion matrix heatmap (3×3) with class names on axes.
+PCA 2D scatter (test set):
+
+Fit PCA on the train standardized features; transform the test standardized features.
+Plot points colored by ground truth; visually mark misclassifications (e.g., different marker/outline).
+Include a legend mapping colors/markers to species and correctness.
+
+
+
+HTML Report (Single File)
+Write a single self-contained HTML file (e.g., output/report.html) that contains:
+
+
+Header & Metadata
+
+Title, timestamp, environment details (Python version, scikit-learn version).
+
+
+
+Kernel & Training Details
+
+Kernel type: linear for both stages.
+C value(s) used.
+Scaling method (StandardScaler).
+Train/Test split details (75/25, stratified, random_state=42).
+Which species were merged and which was the singleton (configurable; indicate actual values used).
+
+
+Stage 1 — Hyperplane & Margin (Singleton vs Merged)
+
+Table listing feature-wise weights (w) and bias (b) in standardized space.
+The margin value 2∥w∥\frac{2}{\|w\|}∥w∥2​.
+Optionally, the back-transformed w and b in original feature units.
+
+
+Stage 2 — Hyperplane & Margin (Within Merged Pair)
+
+Same structure as Stage 1 (weights by feature, bias, margin; optionally back-transformed).
+
+
+Accuracy
+
+Overall test accuracy of final three-class predictions.
+
+
+Predictions vs Ground Truth (25% Test Set)
+
+Table including index, ground_truth, stage1_pred, stage2_pred (blank if not applicable), and final_pred.
+Sort by original index for readability.
+
+
+Confusion Matrix (Final Predictions)
+
+Embed the heatmap image (as base64) so the file is self-contained.
+
+
+PCA 2D Scatter (Test Set)
+
+Embed the PCA plot (as base64).
+Caption explaining markers/colors (e.g., circles = correct, crosses = misclassified).
+
+
+File Handling
+
+Ensure the output directory exists.
+The program prints a terminal message indicating the path to the report (e.g., output/report.html).
+All images must be embedded as base64 (no external files).
+
+
+Reproducibility & Quality
+
+Use random_state=42 for all applicable components.
+Use stratified splitting.
+Clearly label features in all tables using the exact Iris feature names.
+Validate that Stage 2 training uses only the merged group’s training subset (no leakage from test).
+
+
+Acceptance Criteria
+
+Uses a virtual environment and scikit-learn.
+Implements the two-stage SVM cascade:
+
+Stage 1: merged pair vs singleton (default: Setosa vs Non‑Setosa).
+Stage 2: split the merged pair (default: Versicolor vs Virginica).
+
+
+Trains on 75% of data, predicts on 25%.
+Outputs a single HTML report containing:
+
+Kernel details (both stages).
+Weight vector www per stage with feature names, plus margin and bias (standardized space; original units optional).
+Predictions table for the 25% test set with ground truth and final predictions (also include stage-level predictions).
+Test accuracy.
+Confusion matrix heatmap and PCA 2D scatter plot.
+
+
+No external image files; everything embedded.
+
+
+Configuration Notes (Optional)
+
+Allow a CLI/config flag to choose which species is the singleton and which two are merged.
+Allow setting C for each stage independently.
+Allow switching output format to PDF (if desired), but default should remain HTML.
+
